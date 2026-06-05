@@ -39,7 +39,7 @@ It then writes three files to `~/.config/news-brief/`:
 
 Review them; edit anytime. See `config/profile.example.md` for the shape.
 
-> **Tip:** want the brief in Chinese? Set `Output language: 中文` in `profile.md` (or `output_language` in `settings.json`). The whole brief is written in that language — even though this skill's instructions are in English.
+> **Tip:** want the brief in Chinese? Set `Output language: 中文` in `profile.md` (the single source for language and tone). The whole brief is then written in that language — even though this skill's instructions are in English.
 
 ## Step 3 — Run it locally first (dry run)
 
@@ -88,9 +88,9 @@ python3 ~/.claude/skills/news-brief/scripts/send_email.py \
 This is the highest-friction path. Do it only if you actually use Lark.
 
 1. **Set up the Lark bridge** — follow **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)**. It installs `lark-cli` (`npm install -g @larksuite/cli`), walks you through creating the Lark app + bot, enabling the right scopes, and authenticating (`lark-cli config init` → `lark-cli auth login`). Finish that until `lark-cli auth status` succeeds, then come back here.
-2. **Get your open_id** — the brief DMs *you*. Find your `open_id`:
+2. **Get your open_id** — the brief DMs *you*. Print your `open_id`:
    ```bash
-   lark-cli contact   # look up yourself; copy the ou_... id
+   lark-cli contact +get-user --jq '.data.user.open_id'   # prints your ou_... id
    ```
    Put it in `settings.json` as `lark_open_id`, and set `delivery: "lark"`.
 3. **Common errors:**

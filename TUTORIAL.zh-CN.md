@@ -39,7 +39,7 @@ git clone https://github.com/cindyxu1030/Daily-news-skill.git ~/.claude/skills/n
 
 检查一下，随时可改。格式见 `config/profile.example.md`。
 
-> **提示：** 想要中文简报？在 `profile.md` 里把「Output language」设成 `中文`（或在 `settings.json` 里设 `output_language`）。整份简报都会用该语言写——即使技能本身的指令是英文的。
+> **提示：** 想要中文简报？在 `profile.md` 里把「Output language」设成 `中文`（语言和语气都以 `profile.md` 为唯一来源）。整份简报都会用该语言写——即使技能本身的指令是英文的。
 
 ## 第 3 步 — 先在本地跑通（dry run）
 
@@ -88,9 +88,9 @@ python3 ~/.claude/skills/news-brief/scripts/send_email.py \
 这是门槛最高的一条路，只在你确实用飞书时才折腾。
 
 1. **搭好飞书桥** —— 跟着 **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** 走。它会装好 `lark-cli`（`npm install -g @larksuite/cli`），带你创建飞书应用 + 机器人、开通所需权限、完成授权（`lark-cli config init` → `lark-cli auth login`）。跑到 `lark-cli auth status` 成功，再回来这里。
-2. **拿到你的 open_id** —— 简报是私信*你*。查自己的 `open_id`：
+2. **拿到你的 open_id** —— 简报是私信*你*。打印自己的 `open_id`：
    ```bash
-   lark-cli contact   # 查自己，复制 ou_... 那串 id
+   lark-cli contact +get-user --jq '.data.user.open_id'   # 打印你的 ou_... id
    ```
    填进 `settings.json` 的 `lark_open_id`，并把 `delivery` 设成 `"lark"`。
 3. **常见报错：**

@@ -27,6 +27,19 @@ LOG_DIR="$HOME/.config/news-brief/logs"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/newsbrief.log"
 
+# Preflight: this scheduled runner is non-interactive. Onboarding (which builds
+# the config) is interactive and only happens inside Claude Code via /news-brief.
+# If config is missing, fail loudly instead of producing a broken brief.
+CFG="$HOME/.config/news-brief"
+for f in profile.md sources.json settings.json; do
+    if [ ! -f "$CFG/$f" ]; then
+        MSG="Missing $CFG/$f — run /news-brief inside Claude Code first to complete onboarding."
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $MSG" >> "$LOG_FILE"
+        echo "$MSG" >&2
+        exit 1
+    fi
+done
+
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] News Brief starting (model=$MODEL, dry_run=$NEWSBRIEF_DRY_RUN)..." >> "$LOG_FILE"
 
 MAX_ATTEMPTS=4
@@ -39,7 +52,7 @@ while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Attempt $ATTEMPT/$MAX_ATTEMPTS" >> "$LOG_FILE"
     claude \
         --model "$MODEL" \
-        -p "Run news brief" \
+        -p "Run news brief. NEWSBRIEF_DRY_RUN=$NEWSBRIEF_DRY_RUN" \
         >> "$LOG_FILE" 2>&1
     EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then

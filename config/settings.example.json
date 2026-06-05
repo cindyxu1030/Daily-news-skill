@@ -1,14 +1,11 @@
 {
-  "_comment": "Copy to ~/.config/news-brief/settings.json and edit. Controls delivery + recipient. Onboarding can write this for you.",
+  "_comment": "Copy to ~/.config/news-brief/settings.json and edit. Controls DELIVERY only — tone and output language live in profile.md. Onboarding can write this for you.",
   "delivery": "file",
   "_delivery_options": "lark | email | file  (start with 'file' to test locally, then switch)",
 
   "lark_open_id": "<YOUR_LARK_OPEN_ID>",
-  "_lark_hint": "Get yours with: lark-cli contact   (or ask your Lark admin). Needs a bot with scope im:message.send_as_bot.",
+  "_lark_hint": "Get yours with: lark-cli contact +get-user --jq '.data.user.open_id'  (needs the Lark bridge: https://github.com/cindyxu1030/lark-agents-bridge; bot scope to send DMs).",
 
   "email_to": "you@example.com",
-  "_email_hint": "SMTP credentials live in ~/.config/news-brief/.env, not here. See TUTORIAL.md.",
-
-  "output_language": "English",
-  "tone": "factual"
+  "_email_hint": "SMTP credentials live in ~/.config/news-brief/.env, not here. See TUTORIAL.md."
 }
