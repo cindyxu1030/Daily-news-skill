@@ -5,7 +5,7 @@
 A personalized daily **synthesis brief** skill for [Claude Code](https://claude.com/claude-code). On first run it interviews/researches you and writes a persistent **reader profile** (the agent's memory of who it serves). Then, each day, it searches the last 24 hours across *your* lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via **Lark DM, email, or a local file**.
 
 📖 **New here? Read the [step-by-step tutorial](TUTORIAL.md) ([中文](TUTORIAL.zh-CN.md)).**
-👀 **See what it produces: [sample brief](examples/sample-brief.md) · [中文示例](examples/sample-brief.zh-CN.md).**
+👀 **See what it produces: [sample brief](examples/sample-brief.md) · [中文示例](examples/sample-brief.zh-CN.md) · [real Lark DM screenshot](examples/).**
 
 ---
 

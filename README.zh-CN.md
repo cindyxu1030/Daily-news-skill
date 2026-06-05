@@ -5,7 +5,7 @@
 一个为 [Claude Code](https://claude.com/claude-code) 打造的个性化每日**综合简报**技能。第一次运行时，它会先采访 / 研究你，写下一份持久的**读者画像**（agent 对「它在服务谁」的记忆）。之后每天，它跨*你的*视角检索过去 24 小时的新闻，按「时效 / 新鲜度 / 相关性 / 热度 / 跨领域共振 / 个人相关」给每条打分，对过去 7 天去重，挑出覆盖 ≥3 个视角的 5–8 条，并通过 **飞书私信、邮件或本地文件**送达。
 
 📖 **新手？先看[手把手教程](TUTORIAL.zh-CN.md)（[English](TUTORIAL.md)）。**
-👀 **想先看产出长什么样：[中文示例](examples/sample-brief.zh-CN.md) · [English sample](examples/sample-brief.md)。**
+👀 **想先看产出长什么样：[中文示例](examples/sample-brief.zh-CN.md) · [English sample](examples/sample-brief.md) · [真实飞书私信截图](examples/)。**
 
 ---
 
