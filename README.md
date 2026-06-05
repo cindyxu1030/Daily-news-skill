@@ -84,7 +84,8 @@ See `config/profile.example.md` for the full shape.
 
 - `SKILL.md` — skill definition, onboarding, and run flow
 - `scripts/run_brief.sh` — scheduler entrypoint (configurable model via `NEWSBRIEF_MODEL`, `NEWSBRIEF_DRY_RUN=1` for local preview, retry/backoff)
-- `scripts/doctor.sh` — checks your setup (claude, lark-cli, config, placeholders)
+- `scripts/fetch_feeds.py` — deterministic RSS/API/YouTube ingestion (the `feeds` registry); keyless YouTube, optional `YOUTUBE_API_KEY` for outlier ranking. See the [tutorial](TUTORIAL.md#add-trusted-feeds--youtube-optional-recommended)
+- `scripts/doctor.sh` — checks your setup (claude, python3, lark-cli, config, placeholders)
 - `scripts/send_email.py` — optional SMTP delivery
 - `config/*.example.*` — templates for `profile.md`, `sources.json`, `settings.json`
 - `examples/` — sample briefs (EN + 中文)

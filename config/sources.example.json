@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy to ~/.config/news-brief/sources.json and edit. One entry per lens. 'search_terms' shape the WebSearch queries; 'domains' bias results toward outlets you trust.",
+  "_comment": "Copy to ~/.config/news-brief/sources.json and edit. 'lenses' shape the WebSearch passes (search_terms + domains used as allowed_domains). 'feeds' drive scripts/fetch_feeds.py for deterministic RSS/API/YouTube ingestion.",
   "lenses": [
     {
       "name": "AI Core",
@@ -26,5 +26,31 @@
       "search_terms": ["creator economy news", "platform algorithm change", "creator monetization"],
       "domains": ["platformer.news", "garbageday.email", "theverge.com"]
     }
-  ]
+  ],
+
+  "feeds": {
+    "_comment": "Exact feed URLs fetched by scripts/fetch_feeds.py (no SEO ranking, real timestamps). lens = a name from 'lenses' above. RSS broad world feeds support optional filter_keywords + max_items. youtube_channels use FREE per-channel RSS (no key) — see the tutorial for how to find a channel_id. RSS already exposes view counts, so outlier flagging works keyless; set YOUTUBE_API_KEY in ~/.config/news-brief/.env for more reliable view data.",
+    "window_hours": 48,
+    "rss": [
+      {"lens": "AI Core", "source": "OpenAI News", "url": "https://openai.com/news/rss.xml", "reliable": true},
+      {"lens": "AI Core", "source": "Google DeepMind Blog", "url": "https://deepmind.google/blog/rss.xml", "reliable": true},
+      {"lens": "AI Core", "source": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "reliable": true},
+      {"lens": "AI Core", "source": "TLDR AI", "url": "https://tldr.tech/api/rss/ai", "reliable": true},
+      {"lens": "AI Core", "source": "MIT Tech Review AI", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed", "reliable": true},
+      {"lens": "Tech Macro", "source": "Bloomberg Markets", "url": "https://feeds.bloomberg.com/markets/news.rss", "reliable": false, "curl_fallback": true},
+      {"lens": "Tech Macro", "source": "Reddit r/stocks", "url": "https://www.reddit.com/r/stocks/.rss", "reliable": false, "curl_fallback": true},
+      {"lens": "Geopolitics & Econ", "source": "BBC Business", "url": "https://feeds.bbci.co.uk/news/business/rss.xml", "reliable": true},
+      {"lens": "Geopolitics & Econ", "source": "Guardian World", "url": "https://www.theguardian.com/world/rss", "reliable": true, "max_items": 12, "filter_keywords": ["ai", "chip", "semiconductor", "china", "tariff", "sanction", "regulation", "fed", "inflation", "oil", "economy", "tech"]},
+      {"lens": "Geopolitics & Econ", "source": "The Diplomat", "url": "https://thediplomat.com/feed/", "reliable": true}
+    ],
+    "api": [
+      {"lens": "AI Core", "source": "Hugging Face Daily Papers", "type": "api_hf_papers", "url": "https://huggingface.co/api/daily_papers", "reliable": true},
+      {"lens": "Tech Macro", "source": "Hacker News Top", "type": "api_hn", "url": "https://hacker-news.firebaseio.com/v0", "reliable": true, "top_n": 30, "min_score": 100}
+    ],
+    "youtube_channels": [
+      {"lens": "AI Core", "source": "(your AI channel — e.g. AI Explained)", "channel_id": "CHANNEL_ID_HERE"},
+      {"lens": "AI × Marketing", "source": "(your marketing channel)", "channel_id": "CHANNEL_ID_HERE"},
+      {"lens": "Culture & Creator Economy", "source": "(your creator-economy channel — e.g. Colin and Samir)", "channel_id": "CHANNEL_ID_HERE"}
+    ]
+  }
 }

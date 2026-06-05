@@ -23,6 +23,10 @@ echo
 
 echo "Core:"
 if command -v claude >/dev/null 2>&1; then pass "claude CLI found ($(command -v claude))"; else fail "claude CLI not on PATH — install Claude Code"; fi
+if command -v python3 >/dev/null 2>&1; then pass "python3 found (feed fetcher)"; else warn "python3 not found — scripts/fetch_feeds.py won't run; brief falls back to WebSearch only"; fi
+SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -f "$SKILL_DIR/scripts/fetch_feeds.py" ]; then pass "fetch_feeds.py present"; else warn "fetch_feeds.py missing — no deterministic feed/YouTube ingestion"; fi
+if grep -rq "YOUTUBE_API_KEY" "$CFG/.env" 2>/dev/null; then pass "YOUTUBE_API_KEY set (YouTube outlier ranking)"; else warn "no YOUTUBE_API_KEY — YouTube runs keyless (recency + RSS views); optional, see TUTORIAL.md"; fi
 
 echo
 echo "Config (~/.config/news-brief):"

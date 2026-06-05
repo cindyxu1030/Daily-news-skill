@@ -115,6 +115,25 @@ launchctl load ~/Library/LaunchAgents/com.example.newsbrief.plist
 
 用 `NEWSBRIEF_MODEL` 选模型（默认 `sonnet`；想要更深的综合可以 `NEWSBRIEF_MODEL=opus`）。
 
+## 加可信信源 + YouTube（可选，推荐）
+
+普通网页搜索返回的大多是 SEO 榜单页。`scripts/fetch_feeds.py` 解决这个：它读 `sources.json` 里的 `feeds` 块，把真·RSS、Hacker News + Hugging Face API、以及 YouTube 频道拉进候选池——还带真实发布时间戳。它在 Step 2 开头自动跑，你只管编辑注册表。
+
+**编辑 `~/.config/news-brief/sources.json` → `feeds`：**
+- `rss` —— 加 `{ "lens": "...", "source": "...", "url": "https://.../feed.xml" }`。宽口径世界新闻 feed 记得加 `"filter_keywords": [...]` + `"max_items": 12`，让它聚焦。
+- `api` —— Hacker News + Hugging Face papers 已接好。
+- `youtube_channels` —— 加 `{ "lens": "...", "source": "创作者名", "channel_id": "UC..." }`。
+
+**怎么找 YouTube `channel_id`：** 打开频道页 → 查看网页源代码 → 搜 `"channelId":"UC…"`（或 `"externalId":"UC…"`）。一定以 `UC` 开头，复制粘贴即可。
+
+**YouTube 不需要 API key** —— 频道 RSS 自带播放量，所以爆款视频照样能被标记。想要更稳的播放数据，加一个**免费** key：
+1. console.cloud.google.com → 新建项目 → API 和服务 → 启用 **YouTube Data API v3**。
+2. 凭据 → 创建 API 密钥。
+3. 把 `YOUTUBE_API_KEY=你的key` 写进 `~/.config/news-brief/.env`（已 gitignore）。
+费用：**$0** —— 每天免费 10,000 配额单位，一份日报只用 ~1–3。
+
+**测试：** `python3 ~/.claude/skills/news-brief/scripts/fetch_feeds.py`，然后看 `/tmp/newsbrief_candidates.json` —— 确认 `counts.total` 健康，`failed_feeds` 里只有付费墙那几个（Bloomberg/WSJ/FT 本来就时灵时不灵）。
+
 ## 第 6 步 — 持续调优
 
 - 关注点变了就改 `profile.md`，下一份简报立刻跟上。

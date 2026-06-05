@@ -61,7 +61,17 @@ Read (create empty if missing):
 - `~/.config/news-brief/category_history.json` — rolling **14-day** log; array of `{date, lenses_used: [], story_count: N}`
 - `~/.config/news-brief/scoring_log.jsonl` — rolling **30-day** per-story scoring log (debug aid)
 
-### Step 2 — Search each lens (WebSearch, last 24hr)
+### Step 2 — Gather candidates (deterministic feeds + WebSearch)
+
+**2.0 — Deterministic feed pass, run FIRST.**
+
+    python3 ~/.claude/skills/news-brief/scripts/fetch_feeds.py
+
+It reads the `feeds` registry in `sources.json` and writes `/tmp/newsbrief_candidates.json` — RSS feeds, the HN + Hugging Face daily-papers APIs, and YouTube per-channel RSS. Each item is lens-tagged with a REAL `published` timestamp + `published_hours_ago`. YouTube items carry `views` and an `outlier` ratio (views ÷ channel recent-median); `outlier ≥ 1.5` flags an overperforming video. YouTube works **keyless** (RSS exposes view counts); set `YOUTUBE_API_KEY` in `~/.config/news-brief/.env` for more reliable outlier data. Load this file; these are first-class candidates for Step 3.
+
+**GRACEFUL FALLBACK:** if the script errors, the file is missing, or `candidates` is empty, proceed with WebSearch only — never block the brief on the feed pass.
+
+**2.1 — WebSearch passes (last 24hr).**
 
 Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profile.md`. **Steer with `allowed_domains`** — a plain WebSearch returns mostly SEO aggregators/listicles instead of real reporting, and it ignores your source list unless you pass the domains explicitly. Two-pass per lens:
 
@@ -78,9 +88,11 @@ Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profi
 
 Each story scored on these axes. **Sum scores; do not average.** Highest totals win.
 
+**Score BOTH pools together** — feed candidates from `/tmp/newsbrief_candidates.json` and WebSearch results compete in one ranked list. Feed items carry a verified `published` timestamp: use `published_hours_ago` directly for Recency. On overlap, prefer the feed item's URL + timestamp and score it once. A YouTube candidate with `outlier ≥ 1.5` gets a Trending-Heat boost.
+
 | Axis | Range | Notes |
 |---|---|---|
-| **Recency (×2)** | 0–10 | last 6hr = 10 · 6–24hr = 8 · 24–48hr = 5 · >48hr = reject |
+| **Recency (×2)** | 0–10 | last 6hr = 10 · 6–24hr = 8 · 24–48hr = 5 · >48hr = reject. Feed items use real `published_hours_ago`; `published: null` = ">48hr unknown" (downgrade, not auto-reject), needs WebSearch corroboration. |
 | **Novelty** | 0–10 | exact match in seen.json = 0 · same topic new angle = 4–6 · fresh = 8–10 |
 | **Relevance** | 0–10 | stands on its own as worth knowing. No angle-forcing. |
 | **Trending Heat** | 0–10 | viral on X/HN/Reddit/PH OR cited across ≥3 authoritative outlets in 24hr = 8–10 · moderate = 4–6 · niche = 0–3 |
@@ -148,7 +160,7 @@ If it exits non-zero: print the body in conversation and point the reader to the
 
 ### Step 7 — Update caches + log
 
-- Append today's stories to `seen.json` as `{url, headline_hash, date}`. Expire >7 days.
+- Append today's stories to `seen.json` as `{url, headline_hash, date}`. Expire >7 days. For feed-sourced stories, reuse the candidate's pre-computed `headline_hash` + real `published` date (exact cross-day dedup).
 - Append today's entry to `category_history.json` as `{date, lenses_used: [...], story_count: N}`. Expire >14 days.
 - Append per-story scoring entries to `scoring_log.jsonl`:
   ```json

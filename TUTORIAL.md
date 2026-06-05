@@ -115,6 +115,25 @@ launchctl load ~/Library/LaunchAgents/com.example.newsbrief.plist
 
 Pick the model with `NEWSBRIEF_MODEL` (default `sonnet`; e.g. `NEWSBRIEF_MODEL=opus` for deeper synthesis).
 
+## Add trusted feeds + YouTube (optional, recommended)
+
+Plain web search returns mostly SEO listicles. `scripts/fetch_feeds.py` fixes that: it reads the `feeds` block in `sources.json` and pulls real RSS feeds, the Hacker News + Hugging Face APIs, and YouTube channels into the candidate pool — with verified publish timestamps. It runs automatically at the start of Step 2; you just edit the registry.
+
+**Edit `~/.config/news-brief/sources.json` → `feeds`:**
+- `rss` — add `{ "lens": "...", "source": "...", "url": "https://.../feed.xml" }`. For broad world feeds add `"filter_keywords": [...]` + `"max_items": 12` so they stay on-topic.
+- `api` — Hacker News + Hugging Face papers are pre-wired.
+- `youtube_channels` — add `{ "lens": "...", "source": "Creator Name", "channel_id": "UC..." }`.
+
+**Find a YouTube `channel_id`:** open the channel page → View Source → search for `"channelId":"UC…"` (or `"externalId":"UC…"`). It always starts with `UC`. Paste it in.
+
+**YouTube works with NO API key** — channel RSS already includes view counts, so overperforming videos still get flagged. For more reliable view data, add a **free** key:
+1. console.cloud.google.com → new project → APIs & Services → enable **YouTube Data API v3**.
+2. Credentials → Create API key.
+3. Put `YOUTUBE_API_KEY=your-key` in `~/.config/news-brief/.env` (gitignored).
+Cost: **$0** — 10,000 quota units/day free; a daily brief uses ~1–3.
+
+**Test it:** `python3 ~/.claude/skills/news-brief/scripts/fetch_feeds.py` then look at `/tmp/newsbrief_candidates.json` — confirm a healthy `counts.total` and that `failed_feeds` lists only paywalled ones (Bloomberg/WSJ/FT are flaky by design).
+
 ## Step 6 — Tune over time
 
 - Edit `profile.md` whenever your focus shifts — the next brief picks it up.
