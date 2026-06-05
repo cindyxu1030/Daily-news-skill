@@ -54,7 +54,7 @@ cp ~/.claude/skills/news-brief/config/profile.example.md     ~/.config/news-brie
 
 - **`file`**（默认）—— 存到 `~/Documents/NewsBrief/`，零配置，最适合测试。
 - **`email`** —— 走 `scripts/send_email.py`（SMTP 凭据放 `~/.config/news-brief/.env`）。
-- **`lark`** —— 飞书机器人私信，走 `lark-cli`。门槛最高（要装 `lark-cli` + 一个带 `im:message.send_as_bot` 权限的机器人 + 你的 `open_id`）。见**[教程 → 飞书配置](TUTORIAL.zh-CN.md)**。
+- **`lark`** —— 飞书机器人私信。门槛最高：先按 **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** 搭好桥（装 `lark-cli`、建机器人 + 权限、完成授权），再填你的 `open_id`。完整流程见**[教程 → 飞书配置](TUTORIAL.zh-CN.md)**。
 
 建议先用 `file` 跑通，确认输出顺眼，再切换。
 

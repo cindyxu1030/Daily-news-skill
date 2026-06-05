@@ -54,7 +54,7 @@ Set `delivery` in `~/.config/news-brief/settings.json`:
 
 - **`file`** (default) — saved to `~/Documents/NewsBrief/`. Zero config. Best for testing.
 - **`email`** — via `scripts/send_email.py` (SMTP creds in `~/.config/news-brief/.env`).
-- **`lark`** — Lark/飞书 bot DM via `lark-cli`. Highest friction (needs `lark-cli` installed + a bot with scope `im:message.send_as_bot` + your `open_id`). See the **[tutorial → Lark setup](TUTORIAL.md)**.
+- **`lark`** — Lark/飞书 bot DM. Highest friction: set up the bridge first via **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** (installs `lark-cli`, creates the bot + scopes, authenticates), then add your `open_id`. Full walkthrough in the **[tutorial → Lark setup](TUTORIAL.md)**.
 
 Start with `file`, confirm the output looks right, then switch.
 

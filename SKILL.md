@@ -128,7 +128,7 @@ Otherwise read `delivery` from `settings.json`. One of:
 BODY="$(cat /tmp/newsbrief_body.txt)"
 lark-cli im +messages-send --as bot --user-id "<open_id from settings.json>" --text "$BODY"
 ```
-Chunking: if `wc -c < /tmp/newsbrief_body.txt` > **25000**, split on `━━━ ` boundaries into sequential messages, prefixing `(2/N)`, `(3/N)`, … If `lark-cli` exits non-zero: print body in conversation; run `lark-cli auth status` (needs scope `im:message.send_as_bot`).
+Chunking: if `wc -c < /tmp/newsbrief_body.txt` > **25000**, split on `━━━ ` boundaries into sequential messages, prefixing `(2/N)`, `(3/N)`, … If `lark-cli` is missing or exits non-zero: print the body in conversation and point the reader to the Lark bridge setup (https://github.com/cindyxu1030/lark-agents-bridge) and `lark-cli auth status`.
 
 **`email`** — send via the bundled sender (SMTP creds from env / `~/.config/news-brief/.env`):
 ```bash

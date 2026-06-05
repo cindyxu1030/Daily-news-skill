@@ -87,18 +87,16 @@ python3 ~/.claude/skills/news-brief/scripts/send_email.py \
 
 This is the highest-friction path. Do it only if you actually use Lark.
 
-1. **Install `lark-cli`** — the Lark/Feishu command-line bridge. <!-- TODO: replace with the canonical lark-cli install link/source --> Install it per its own docs and make sure `lark-cli` is on your `PATH`.
-2. **Configure the app** — `lark-cli config init`, then provide your Lark app credentials (app id / secret from your Lark developer console).
-3. **Authenticate** — `lark-cli auth login`. The bot needs the scope **`im:message.send_as_bot`**.
-4. **Get your open_id** — the brief DMs *you*. Find your `open_id`:
+1. **Set up the Lark bridge** — follow **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)**. It installs `lark-cli` (`npm install -g @larksuite/cli`), walks you through creating the Lark app + bot, enabling the right scopes, and authenticating (`lark-cli config init` → `lark-cli auth login`). Finish that until `lark-cli auth status` succeeds, then come back here.
+2. **Get your open_id** — the brief DMs *you*. Find your `open_id`:
    ```bash
    lark-cli contact   # look up yourself; copy the ou_... id
    ```
    Put it in `settings.json` as `lark_open_id`, and set `delivery: "lark"`.
-5. **Common errors:**
-   - `lark-cli: command not found` → not installed / not on PATH.
+3. **Common errors:**
+   - `lark-cli: command not found` → bridge not installed / not on PATH (revisit the bridge setup).
    - auth / token expired → re-run `lark-cli auth login`.
-   - permission denied on send → the bot is missing `im:message.send_as_bot`; add the scope in the developer console and re-auth.
+   - permission denied on send → the bot is missing a send scope; check the scope list in [lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge), add it in the developer console, and re-auth.
    - run `./scripts/doctor.sh` to check auth + a still-unreplaced `<YOUR_LARK_OPEN_ID>`.
 
 ## Step 5 — Schedule it daily

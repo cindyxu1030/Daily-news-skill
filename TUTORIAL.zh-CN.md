@@ -87,18 +87,16 @@ python3 ~/.claude/skills/news-brief/scripts/send_email.py \
 
 这是门槛最高的一条路，只在你确实用飞书时才折腾。
 
-1. **安装 `lark-cli`** —— 飞书命令行桥。<!-- TODO: 替换成 lark-cli 的官方安装链接/来源 --> 按它自己的文档安装，并确保 `lark-cli` 在你的 `PATH` 里。
-2. **配置应用** —— `lark-cli config init`，填入你的飞书应用凭据（在飞书开放平台拿 app id / secret）。
-3. **登录授权** —— `lark-cli auth login`。机器人需要权限 **`im:message.send_as_bot`**。
-4. **拿到你的 open_id** —— 简报是私信*你*。查自己的 `open_id`：
+1. **搭好飞书桥** —— 跟着 **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** 走。它会装好 `lark-cli`（`npm install -g @larksuite/cli`），带你创建飞书应用 + 机器人、开通所需权限、完成授权（`lark-cli config init` → `lark-cli auth login`）。跑到 `lark-cli auth status` 成功，再回来这里。
+2. **拿到你的 open_id** —— 简报是私信*你*。查自己的 `open_id`：
    ```bash
    lark-cli contact   # 查自己，复制 ou_... 那串 id
    ```
    填进 `settings.json` 的 `lark_open_id`，并把 `delivery` 设成 `"lark"`。
-5. **常见报错：**
-   - `lark-cli: command not found` → 没装 / 不在 PATH。
+3. **常见报错：**
+   - `lark-cli: command not found` → 桥没装好 / 不在 PATH（回去重看桥的安装）。
    - auth / token 过期 → 重新 `lark-cli auth login`。
-   - 发送时 permission denied → 机器人缺 `im:message.send_as_bot`，去开放平台加权限再重新授权。
+   - 发送时 permission denied → 机器人缺发送权限，对照 [lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge) 里的权限清单，去开放平台加上再重新授权。
    - 跑 `./scripts/doctor.sh` 查授权状态、以及是否还留着没替换的 `<YOUR_LARK_OPEN_ID>`。
 
 ## 第 5 步 — 设成每天定时
