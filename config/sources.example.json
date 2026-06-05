@@ -1,0 +1,30 @@
+{
+  "_comment": "Copy to ~/.config/news-brief/sources.json and edit. One entry per lens. 'search_terms' shape the WebSearch queries; 'domains' bias results toward outlets you trust.",
+  "lenses": [
+    {
+      "name": "AI Core",
+      "search_terms": ["new AI model release", "AI lab announcement", "frontier model research"],
+      "domains": ["openai.com", "anthropic.com", "deepmind.google", "arxiv.org", "techcrunch.com"]
+    },
+    {
+      "name": "AI × Marketing",
+      "search_terms": ["AI advertising tool", "martech AI launch", "agency AI adoption"],
+      "domains": ["marketingbrew.com", "adweek.com", "adage.com", "searchenginejournal.com"]
+    },
+    {
+      "name": "Tech Macro",
+      "search_terms": ["big tech earnings", "AI chip news", "tech IPO", "AI consulting firm"],
+      "domains": ["stratechery.com", "theinformation.com", "techcrunch.com", "bloomberg.com"]
+    },
+    {
+      "name": "Geopolitics & Econ",
+      "search_terms": ["AI regulation", "US-China tech decoupling", "interest rates", "energy markets"],
+      "domains": ["reuters.com", "ft.com", "bloomberg.com", "wsj.com", "semafor.com"]
+    },
+    {
+      "name": "Culture & Creator Economy",
+      "search_terms": ["creator economy news", "platform algorithm change", "creator monetization"],
+      "domains": ["platformer.news", "garbageday.email", "theverge.com"]
+    }
+  ]
+}
