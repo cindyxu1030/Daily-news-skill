@@ -1,3 +1,5 @@
+<p align="right"><strong>English</strong> | <a href="README.zh-CN.md">中文</a></p>
+
 # news-brief
 
 A personalized daily **synthesis brief** skill for [Claude Code](https://claude.com/claude-code). Searches the last 24 hours across 5 configurable lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance signal, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and **delivers the digest as a Lark DM** (bot → you). Built as a personal reader and synthesis primer — not a content pipeline.
