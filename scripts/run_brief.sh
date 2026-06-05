@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # News Brief runner — called by a scheduler (macOS LaunchAgent or cron) at your chosen time.
-# Uses Sonnet 4.6 for cost-efficient research.
+# Local test:  NEWSBRIEF_DRY_RUN=1 ./scripts/run_brief.sh   (writes to ~/Documents/NewsBrief/, no send)
 
 set -euo pipefail
 
 # Add the directory containing the `claude` binary to PATH if it isn't already.
-# Adjust as needed for your install (this covers common Homebrew + user-local paths).
+# Adjust for your install (covers common Homebrew + user-local paths).
 export PATH="$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH"
 
 ENV_FILE="$HOME/.config/news-brief/.env"
@@ -15,11 +15,19 @@ if [ -f "$ENV_FILE" ]; then
     set +a
 fi
 
+# Model is configurable. Default to the `sonnet` alias so it tracks the current
+# Sonnet without a hardcoded version. Override with NEWSBRIEF_MODEL=opus (etc.).
+MODEL="${NEWSBRIEF_MODEL:-sonnet}"
+
+# DRY_RUN=1 → skill writes to the local archive only and skips Lark/email.
+# Exported so the skill prompt can read it. Defaults to 0 (real delivery).
+export NEWSBRIEF_DRY_RUN="${NEWSBRIEF_DRY_RUN:-0}"
+
 LOG_DIR="$HOME/.config/news-brief/logs"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/newsbrief.log"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] News Brief starting..." >> "$LOG_FILE"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] News Brief starting (model=$MODEL, dry_run=$NEWSBRIEF_DRY_RUN)..." >> "$LOG_FILE"
 
 MAX_ATTEMPTS=4
 ATTEMPT=1
@@ -30,7 +38,7 @@ set +e
 while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Attempt $ATTEMPT/$MAX_ATTEMPTS" >> "$LOG_FILE"
     claude \
-        --model claude-sonnet-4-6 \
+        --model "$MODEL" \
         -p "Run news brief" \
         >> "$LOG_FILE" 2>&1
     EXIT_CODE=$?

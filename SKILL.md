@@ -1,44 +1,73 @@
 ---
 name: news-brief
-description: A personalized daily synthesis brief. Use when the user types /news-brief, /brief, /NewsBrief, "run news brief", "run the news brief", or asks for "today's news", "morning news", "daily brief", "news digest", "AI news", or similar. Surfaces what's hot, groundbreaking, and compounding for the reader's specific interests. Searches the last 24 hours across 5 configurable lenses (default: AI Core, AI × Marketing, Tech Macro, Geopolitics & Econ, Culture & Creator Economy), scores on recency + novelty + relevance + trending heat + cross-category resonance + a personal-relevance signal, deduplicates against last 7 days, selects 5–8 stories spanning ≥3 lenses, and sends a synthesis brief via Lark DM (bot). Selection biased toward what compounds; tone factual. Can also run automatically on a daily schedule via a LaunchAgent (macOS) or cron.
+description: A personalized daily synthesis brief. Use when the user types /news-brief, /brief, /NewsBrief, "run news brief", "set up news brief", "today's news", "morning news", "daily brief", "news digest", "AI news", or similar. On first run it interviews/researches the reader and writes a persistent profile (the agent's memory of who it serves). Then it searches the last 24 hours across the reader's configurable lenses, scores on recency + novelty + relevance + trending heat + cross-category resonance + a personal-relevance signal, deduplicates against last 7 days, selects 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via Lark DM, email, or a local markdown file. Selection biased toward what compounds; tone factual. Can run automatically on a daily schedule via LaunchAgent (macOS) or cron.
 ---
 
-# News Brief — Solopreneur Synthesis Brief
+# News Brief — Personalized Synthesis Brief
 
-Purpose: Surface industry signal that compounds for **you**. The brief should help you stay current in your field, spot opportunities, and fuel cross-domain synthesis. **Selection biased toward what compounds; tone factual.**
+Purpose: Surface industry signal that compounds for **its reader**. The brief helps the reader stay current in their field, spot opportunities, and fuel cross-domain synthesis. **Selection biased toward what compounds; tone factual.**
 
-> **⚙️ Customize this — start here.** This skill ships with a default reader profile (a solo founder / creator working in AI & tech) so it runs out of the box. Rewrite the line below to describe *yourself* — role, field, what you're trying to learn, what you'd act on. Then edit the lenses (Step 2) and the personal-relevance signal (Step 3) to match. The more specific your profile, the better the picks.
->
-> **Reader profile (EDIT ME):** `<one or two sentences: who you are, your field, what you want this brief to help you do>`
+The reader is defined by `~/.config/news-brief/profile.md` — built once during onboarding and read on every run. It is the agent's long-term memory of who this brief serves.
+
+---
+
+## First run — build the reader profile (onboarding)
+
+**Trigger this section when** `~/.config/news-brief/profile.md` is missing, OR the user says "set up news brief" / "redo my profile". After it completes, continue into the normal Run flow.
+
+Goal: produce `profile.md`, `sources.json`, and `settings.json` for this reader. Use BOTH research and interview — research what the reader hands you, interview to fill the gaps.
+
+### A. Research (use what the reader already has)
+
+Ask once: *"To tune this to you — share anything that describes you: a short bio, a link to your X / LinkedIn / personal site, or a path to a notes file. Or skip and I'll just ask you a few questions."*
+
+- If a URL is given → WebFetch it; extract role, field, recurring themes, the people/outlets they reference.
+- If a local file path is given → read it.
+- **Only read what the reader hands you.** Do not hunt beyond provided links. (See the privacy note in the tutorial.)
+
+### B. Interview (ask only what research didn't already answer)
+
+1. What do you do? (role / industry / what you're building)
+2. What 4–6 topics do you want to track daily? → these become your **lenses**.
+3. For each topic, which outlets or people do you trust most?
+4. What decisions or actions should this brief feed — what would you actually *act on*?
+5. Where do you discover news today? (so the brief mirrors your real sources)
+6. Delivery channel: **Lark DM**, **email**, or **local file**? + the recipient (Lark `open_id` or email address).
+7. Any tone preferences? (default: factual, no hype)
+8. **Output language** for the brief? (e.g. English / 中文 / bilingual — default English)
+
+### C. Synthesize + write (confirm before saving)
+
+Draft, show the reader, adjust on feedback, then write:
+
+1. `~/.config/news-brief/profile.md` — see the template in `config/profile.example.md`. Fill: who they are, goals, what they'd act on, their lenses (with a one-line "why it matters to me" each), their personal-relevance patterns, tone, and **output language**.
+2. `~/.config/news-brief/sources.json` — seed from their lenses + trusted outlets, using the `config/sources.example.json` shape.
+3. `~/.config/news-brief/settings.json` — using `config/settings.example.json` shape: `delivery` (lark|email|file) + recipient fields.
+
+Confirm one line: *"Profile saved. Run `/news-brief` anytime, or I'll run it now."* Then continue to the Run flow.
 
 ---
 
 ## Run flow
 
-### Step 1 — Load caches
+### Step 1 — Load profile + caches
 
-Read these files (create empty if missing):
+Read (create empty if missing):
 
-- `~/.config/news-brief/sources.json` — lens registry (sources + search guidance). See `config/sources.example.json` in this repo for the structure.
+- `~/.config/news-brief/profile.md` — **the reader.** If missing → run onboarding above first.
+- `~/.config/news-brief/settings.json` — delivery channel + recipient + tone.
+- `~/.config/news-brief/sources.json` — lens registry (sources + search guidance). See `config/sources.example.json`.
 - `~/.config/news-brief/seen.json` — rolling **7-day** dedup cache; array of `{url, headline_hash, date}`
 - `~/.config/news-brief/category_history.json` — rolling **14-day** log; array of `{date, lenses_used: [], story_count: N}`
 - `~/.config/news-brief/scoring_log.jsonl` — rolling **30-day** per-story scoring log (debug aid)
 
 ### Step 2 — Search each lens (WebSearch, last 24hr)
 
-Run 2–3 targeted WebSearch queries per lens. Use `sources.json` to shape search terms. **Stories can carry MULTIPLE lenses — tag accordingly.** The 5 default lenses (replace with your own interests):
+Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profile.md`. Use the listed domains to shape search terms. **Stories can carry MULTIPLE lenses — tag accordingly.**
 
-| Lens | Scope |
-|---|---|
-| **AI Core** | Model releases, lab news, research, frontier-lab moves (OpenAI, Anthropic, Google DeepMind, Meta AI, DeepSeek, MiniMax, Kimi/Moonshot, ByteDance, research papers) |
-| **AI × Marketing** | Adtech/martech updates, agency AI moves, marketing-platform updates, AI-creative tooling, ad-industry transformation (Marketing Brew, AdWeek, AdAge, Adobe, Salesforce, HubSpot, Search Engine Journal) |
-| **Tech Macro** | Big tech earnings, chips, IPOs, VC moves, **AI services / consulting firms**, platform policy (Stratechery, The Information, TechCrunch, The Verge, Bloomberg tech) |
-| **Geopolitics & Econ** | Wars, oil, rates, US-China decoupling, AI regulation (Reuters, FT, Bloomberg, WSJ, Semafor, Axios) |
-| **Culture & Creator Economy** | Algorithm shifts, creator pay, viral moments, creator tools, platform policy (Platformer, Garbage Day, Link in Bio, Hung Up, Verge creator coverage) |
-
-**Add 2 dedicated trending-heat searches** (cross-lens):
-- "Hacker News front page AI today" / "trending HN AI startup"
-- "X tech founder trending today" / "viral AI thread"
+**Add 2 dedicated trending-heat searches** (cross-lens), adapted to the reader's field:
+- "Hacker News front page [reader's field] today" / "trending HN [field]"
+- "X / trending [field] thread today"
 
 ### Step 3 — Score each candidate
 
@@ -49,9 +78,9 @@ Each story scored on these axes. **Sum scores; do not average.** Highest totals 
 | **Recency (×2)** | 0–10 | last 6hr = 10 · 6–24hr = 8 · 24–48hr = 5 · >48hr = reject |
 | **Novelty** | 0–10 | exact match in seen.json = 0 · same topic new angle = 4–6 · fresh = 8–10 |
 | **Relevance** | 0–10 | stands on its own as worth knowing. No angle-forcing. |
-| **Trending Heat** | 0–10 | viral on X/HN/Reddit/PH OR cited across ≥3 authoritative outlets in 24hr = 8–10 · moderate buzz = 4–6 · niche = 0–3 |
+| **Trending Heat** | 0–10 | viral on X/HN/Reddit/PH OR cited across ≥3 authoritative outlets in 24hr = 8–10 · moderate = 4–6 · niche = 0–3 |
 | **Cross-Category Resonance (CCR)** | 0–5 | ≥2 lenses = +3 · ≥3 lenses = +5. **Gated by novelty ≥7.** Otherwise CCR = 0. |
-| **Personal-Relevance Signal** | 0–5 | matches patterns specific to your reader profile — edit these to fit. Example (solo founder / creator): indie/solo raises, AI agency or services-firm moves, AI replacing traditional services, creator tooling, no-code/solo workflows, freelancer market shifts |
+| **Personal-Relevance Signal** | 0–5 | match against the patterns in `profile.md` → "Personal-relevance signal". The stronger the match to who this reader is and what they'd act on, the higher. |
 
 **Hard rules:**
 - Drop anything in `seen.json` unless real new development (new model, new data, new milestone).
@@ -61,16 +90,13 @@ Each story scored on these axes. **Sum scores; do not average.** Highest totals 
 
 - **Span ≥3 lenses.** If top stories cluster in 1–2, demote duplicates and promote next-best from other lenses.
 - **Soft penalty for over-used lens** — lens used 3 days running = −1 score. **Exception**: story with CCR ≥2 ignores the penalty.
-- **Flex story count**:
-  - Slow day (<5 stories scoring 25+) → 5 stories. **No padding.**
-  - Default day → 6 stories.
-  - Hot day (≥2 stories scoring 30+) → up to 8 stories.
+- **Flex story count**: slow day (<5 stories scoring 25+) → 5, **no padding** · default → 6 · hot day (≥2 stories scoring 30+) → up to 8.
 - **1 wildcard slot**: highest-novelty story regardless of lens.
-- **Drop "Skipped today" filler** — wasted real estate. Just deliver the picks.
+- **Drop "Skipped today" filler.** Just deliver the picks.
 
 ### Step 5 — Format brief body
 
-Write to `/tmp/newsbrief_body.txt`. Tone factual; selection biased.
+Write to `/tmp/newsbrief_body.txt`. Tone per `profile.md` (default factual; selection biased). **Write in the reader's output language from `profile.md`** (default English) — labels, summaries, and "why it matters" all follow that language.
 
 ```
 N stories for today — lenses: [list].
@@ -80,57 +106,50 @@ N stories for today — lenses: [list].
    [Source] · [URL] · [X] hours ago
    Summary: 2–3 sentences. What happened + why it happened.
    Why it matters: 1 sentence. The actual stakes — name the mechanism.
-   Why it matters to you: 1 sentence. The angle for your reader profile. (OPTIONAL — only when angle is real; skip when weak. Do NOT force.)
-
-2. [Headline]
-   ...
+   Why it matters to you: 1 sentence. The angle for THIS reader, per profile.md. (OPTIONAL — only when genuine; skip when weak. Do NOT force.)
 
 ━━━ [NEXT LENS] ━━━
-3. [Headline]
-   ...
+2. ...
 
 ━━━ WILDCARD ━━━
-N. [Headline]
-   ...
+N. ...
 ```
 
-**"Why it matters to you" rules:**
-- Optional per story — include only when angle is genuine and specific.
-- Not script-writing. Not persona voice. Not a marketing CTA.
-- Pure synthesis prime — name the implication for your reader profile in one sentence.
-- If angle is a generic "this is good for people like me" without specifics → SKIP.
+**"Why it matters to you" rules:** optional per story; include only when the angle to this reader's goals/actions is real and specific. Not script-writing, not persona voice, not a CTA. Generic "good for people like you" → SKIP.
 
-### Step 6 — Send via Lark DM (bot → you)
+### Step 6 — Deliver (channel from `settings.json`)
 
-Send brief as a Lark DM from your app bot to your Lark `open_id`. Replace the placeholder below with your own open_id (find it via `lark-cli contact` or your Lark admin).
+**Dry run first:** if env `NEWSBRIEF_DRY_RUN=1` (or `settings.json` `delivery` = `file`), skip sending — write the archive only (Step 8) and report the path. Run this way until the output looks right, then switch on Lark/email.
 
-Single message (default — body usually 2–5 KB):
+Otherwise read `delivery` from `settings.json`. One of:
 
+**`lark`** — DM from your app bot to the reader's open_id:
 ```bash
 BODY="$(cat /tmp/newsbrief_body.txt)"
-lark-cli im +messages-send \
-  --as bot \
-  --user-id <YOUR_LARK_OPEN_ID> \
-  --text "$BODY"
+lark-cli im +messages-send --as bot --user-id "<open_id from settings.json>" --text "$BODY"
 ```
+Chunking: if `wc -c < /tmp/newsbrief_body.txt` > **25000**, split on `━━━ ` boundaries into sequential messages, prefixing `(2/N)`, `(3/N)`, … If `lark-cli` exits non-zero: print body in conversation; run `lark-cli auth status` (needs scope `im:message.send_as_bot`).
 
-**Chunking rule** — Lark text-message API hard-caps payload size. If `wc -c < /tmp/newsbrief_body.txt` returns > **25000**, split into multiple sends:
+**`email`** — send via the bundled sender (SMTP creds from env / `~/.config/news-brief/.env`):
+```bash
+python3 ~/.claude/skills/news-brief/scripts/send_email.py \
+  --to "<email from settings.json>" \
+  --subject "News Brief — $(date '+%Y-%m-%d')" \
+  --body-file /tmp/newsbrief_body.txt
+```
+If it exits non-zero: print the body in conversation and point the reader to the email setup in `TUTORIAL.md`.
 
-1. Lead message: header line + lens list.
-2. Split body on `━━━ ` boundaries — each lens block becomes its own message. Prepend chunk index `(2/N)`, `(3/N)`, ... to each follow-up.
-3. Send chunks sequentially with same `--as bot --user-id ...` command.
-
-If `lark-cli` exits non-zero: print body in conversation; run `lark-cli auth status`. Missing scope hint: `im:message.send_as_bot`, plus reauth if token expired.
+**`file`** — no send; the archive in Step 8 is the delivery. Tell the reader the path.
 
 ### Step 7 — Update caches + log
 
-- Append today's stories to `seen.json` as `{url, headline_hash, date}`. Expire entries >7 days.
-- Append today's entry to `category_history.json` as `{date, lenses_used: [...], story_count: N}`. Expire entries >14 days.
-- Append per-story scoring entries to `~/.config/news-brief/scoring_log.jsonl`:
+- Append today's stories to `seen.json` as `{url, headline_hash, date}`. Expire >7 days.
+- Append today's entry to `category_history.json` as `{date, lenses_used: [...], story_count: N}`. Expire >14 days.
+- Append per-story scoring entries to `scoring_log.jsonl`:
   ```json
   {"date": "YYYY-MM-DD", "headline": "...", "url": "...", "lenses": [...], "scores": {"recency": 10, "novelty": 9, "relevance": 9, "heat": 8, "ccr": 5, "signal": 4}, "total": 45, "selected": true, "reject_reason": null}
   ```
-  Log BOTH selected and top-5 rejected stories per day. Expire entries >30 days. Use this to debug future misses.
+  Log BOTH selected and top-5 rejected per day. Expire >30 days. Use it to debug future misses.
 
 ### Step 8 — Archive
 
@@ -138,24 +157,21 @@ Save brief body as markdown to `~/Documents/NewsBrief/YYYY-MM-DD.md`. Overwrite 
 
 ### Step 9 — Confirm
 
-One-line confirmation:
-
 ```
-News Brief sent via Lark DM — N stories, lenses: [list]. Archive: ~/Documents/NewsBrief/YYYY-MM-DD.md
+News Brief delivered via [channel] — N stories, lenses: [list]. Archive: ~/Documents/NewsBrief/YYYY-MM-DD.md
 ```
 
 ---
 
 ## Standing rules
 
-- **Tone factual; selection biased toward your interests.** No persona voice, no marketing voice.
+- **The reader is `profile.md`.** Bias selection toward who they are and what they'd act on. Re-read it every run.
+- **Tone factual; selection biased.** No persona voice, no marketing voice.
 - **No script generation, no CTAs.** Brief is fuel for synthesis, not output.
 - **No fabricated urgency.** Slow news → ship 5 stories, no padding.
-- **Dedup by storyline, not entity.** Two stories about the same company on different events = both OK. Compare headline_hash + storyline, not entity overlap alone.
+- **Dedup by storyline, not entity.** Same company, different events = both OK. Compare headline_hash + storyline.
 - **Cite source + URL for every story.** Non-negotiable.
-- **"Why it matters" must be specific** — name the actual mechanism (who's affected, how much, by when).
-- **"Why it matters to you" is optional and earned.** Skip when angle is weak. Don't force formulaic lines.
-- **Cross-category bias is intentional.** Stories spanning multiple lenses are higher value than single-bucket stories. Score reflects that.
+- **"Why it matters" must be specific** — name the mechanism (who's affected, how much, by when).
 - **Today's date = today.** Use `currentDate` from system context. Don't include stories older than 48hr.
 
 ---
