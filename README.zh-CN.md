@@ -2,7 +2,7 @@
 
 # news-brief
 
-一个为 [Claude Code](https://claude.com/claude-code) 打造的个性化每日**综合简报**技能。第一次运行时，它会先采访 / 研究你，写下一份持久的**读者画像**（agent 对「它在服务谁」的记忆）。之后每天，它从 **可信 RSS 源、Hacker News 与 Hugging Face API、你追踪的 YouTube 创作者、以及按域名定向的网页搜索** 跨*你的*视角抓取候选，按「时效 / 新鲜度 / 相关性 / 热度 / 跨领域共振 / 个人相关」给每条打分，对过去 7 天去重，挑出覆盖 ≥3 个视角的 5–8 条，并通过 **飞书私信、邮件或本地文件**送达。
+一个个性化每日**综合简报** —— 为 [Claude Code](https://claude.com/claude-code) 打造的 agentic 技能，也可移植到其他 LLM agent（见[运行环境与模型](#运行环境与模型)）。第一次运行时，它会先采访 / 研究你，写下一份持久的**读者画像**（agent 对「它在服务谁」的记忆）。之后每天，它从 **可信 RSS 源、Hacker News 与 Hugging Face API、你追踪的 YouTube 创作者、以及按域名定向的网页搜索** 跨*你的*视角抓取候选，按「时效 / 新鲜度 / 相关性 / 热度 / 跨领域共振 / 个人相关」给每条打分，对过去 7 天去重，挑出覆盖 ≥3 个视角的 5–8 条，并通过 **飞书私信、邮件或本地文件**送达。
 
 📖 **新手？先看[手把手教程](TUTORIAL.zh-CN.md)（[English](TUTORIAL.md)）。**
 👀 **想先看产出长什么样：[中文示例](examples/sample-brief.zh-CN.md) · [English sample](examples/sample-brief.md) · [真实飞书私信截图](examples/)。**
@@ -11,11 +11,25 @@
 
 ## 这个适合你吗？
 
-**适合：** 会用 Claude Code、愿意敲几行终端命令、想要一份贴着自己领域的简报——一个先学会你、再照着挑的 agent。
+**适合：** 会用 agentic LLM CLI（Claude Code 是参考实现；Codex 或任何带网页搜索 + shell + 文件工具的 agent 也行）、愿意敲几行终端命令、想要一份贴着自己领域的简报——一个先学会你、再照着挑的 agent。
 
-**不适合：** 只想一键收 AI 新闻、不碰终端、期待零配置的人。（飞书是可选的——也能用邮件或本地文件——但 Claude Code 必须有。）
+**不适合：** 只想一键收 AI 新闻、不碰终端、期待零配置的人。（飞书是可选的——也能用邮件或本地文件——但你确实需要一个 agentic LLM CLI；见[运行环境与模型](#运行环境与模型)。）
 
 > **输出语言：** 技能的指令是英文写的，但简报会用你在画像里设定的语言输出（`Output language: 中文` → 全中文简报）。
+
+---
+
+## 运行环境与模型
+
+**不绑定 Claude Code，也不绑定单一模型。**
+
+- **模型** —— 随便。默认 Claude（Opus / Sonnet / Haiku）；DeepSeek、MiniMax、智谱/GLM、GPT 等也行，通过你 agent 的模型配置或 `NEWSBRIEF_MODEL` 设定。简报由哪个模型写，run-flow 不在乎。
+- **运行环境** —— `SKILL.md` 里的 9 步就是普通指令。任何带**网页搜索 + shell + 文件**工具的 agentic CLI 都能跑（Codex 等）。只有*封装层*是 Claude Code 特有、且很好替换：
+  - 技能自动发现 + `/news-brief` 触发 → 换 agent 就直接把 `SKILL.md` 喂给它；
+  - `scripts/run_brief.sh` 里那行 `claude …` → 换成你 agent 的 CLI 调用。
+- **本来就与运行环境无关** —— `scripts/fetch_feeds.py`（feeds + YouTube）和 `scripts/send_email.py` 是纯 Python，在任何 agent 下都一样跑。
+
+Claude Code 最省事（slash 命令 + 定时开箱即用）；其它都是小适配，不是重写。
 
 ---
 

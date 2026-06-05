@@ -2,7 +2,7 @@
 
 # news-brief
 
-A personalized daily **synthesis brief** skill for [Claude Code](https://claude.com/claude-code). On first run it interviews/researches you and writes a persistent **reader profile** (the agent's memory of who it serves). Then, each day, it pulls candidates from **trusted RSS feeds, the Hacker News & Hugging Face APIs, your tracked YouTube creators, and domain-steered web search** across *your* lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via **Lark DM, email, or a local file**.
+A personalized daily **synthesis brief** — an agentic skill built for [Claude Code](https://claude.com/claude-code) and portable to other LLM agents (see [Runtime & models](#runtime--models)). On first run it interviews/researches you and writes a persistent **reader profile** (the agent's memory of who it serves). Then, each day, it pulls candidates from **trusted RSS feeds, the Hacker News & Hugging Face APIs, your tracked YouTube creators, and domain-steered web search** across *your* lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via **Lark DM, email, or a local file**.
 
 📖 **New here? Read the [step-by-step tutorial](TUTORIAL.md) ([中文](TUTORIAL.zh-CN.md)).**
 👀 **See what it produces: [sample brief](examples/sample-brief.md) · [中文示例](examples/sample-brief.zh-CN.md) · [real Lark DM screenshot](examples/).**
@@ -11,11 +11,25 @@ A personalized daily **synthesis brief** skill for [Claude Code](https://claude.
 
 ## Is this for you?
 
-**Good fit:** you use Claude Code, are OK with a few terminal commands, and want a brief tuned to your field — an agent that learns you once and curates accordingly.
+**Good fit:** you use an agentic LLM CLI (Claude Code is the reference; Codex or any agent with web-search + shell + file tools works too), are OK with a few terminal commands, and want a brief tuned to your field — an agent that learns you once and curates accordingly.
 
-**Not a fit:** you just want a one-click AI-news feed, won't touch a terminal, or expect zero setup. (Lark is optional — email or a local file work too — but Claude Code is required.)
+**Not a fit:** you just want a one-click AI-news feed, won't touch a terminal, or expect zero setup. (Lark is optional — email or a local file work too — but you do need an agentic LLM CLI; see [Runtime & models](#runtime--models).)
 
 > **Output language:** the skill's instructions are in English, but the brief is written in whatever language you set in your profile (`Output language: 中文` → a fully Chinese brief).
+
+---
+
+## Runtime & models
+
+**Not locked to Claude Code, and not locked to one model.**
+
+- **Model** — any. Claude (Opus / Sonnet / Haiku) by default; DeepSeek, MiniMax, Zhipu/GLM, GPT, etc. work too, set via your agent's model config or `NEWSBRIEF_MODEL`. The run-flow doesn't care which model writes the brief.
+- **Runtime** — the 9-step flow in `SKILL.md` is plain instructions. Any agentic CLI with **web search + shell + file** tools can execute it (Codex, etc.). Only the *packaging* is Claude-Code-specific and easily swapped:
+  - skill auto-discovery + the `/news-brief` trigger → on another agent, paste/point it at `SKILL.md`;
+  - `scripts/run_brief.sh`'s `claude …` line → replace with your agent's CLI invocation.
+- **Runtime-agnostic already** — `scripts/fetch_feeds.py` (feeds + YouTube) and `scripts/send_email.py` are plain Python; they run the same under any agent.
+
+Claude Code is the path of least resistance (slash command + scheduling work out of the box); everything else is a small adaptation, not a rewrite.
 
 ---
 

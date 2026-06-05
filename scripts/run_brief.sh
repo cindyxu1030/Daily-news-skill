@@ -50,6 +50,9 @@ BACKOFF=60
 set +e
 while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Attempt $ATTEMPT/$MAX_ATTEMPTS" >> "$LOG_FILE"
+    # Reference runtime = Claude Code. To run on another agentic CLI (Codex, etc.),
+    # replace this one invocation with that agent's equivalent (point it at SKILL.md
+    # with the same "Run news brief" instruction). The rest of the pipeline is unchanged.
     claude \
         --model "$MODEL" \
         -p "Run news brief. NEWSBRIEF_DRY_RUN=$NEWSBRIEF_DRY_RUN" \
