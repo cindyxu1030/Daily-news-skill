@@ -63,11 +63,16 @@ Read (create empty if missing):
 
 ### Step 2 — Search each lens (WebSearch, last 24hr)
 
-Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profile.md`. Use the listed domains to shape search terms. **Stories can carry MULTIPLE lenses — tag accordingly.**
+Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profile.md`. **Steer with `allowed_domains`** — a plain WebSearch returns mostly SEO aggregators/listicles instead of real reporting, and it ignores your source list unless you pass the domains explicitly. Two-pass per lens:
 
-**Add 2 dedicated trending-heat searches** (cross-lens), adapted to the reader's field:
+1. **Authoritative pass** — pass `allowed_domains` = that lens's trusted domains from `sources.json`. This is where the signal lives.
+2. **Breadth pass** — one open query (no domain filter) to catch stories outside the source list.
+
+**Stories can carry MULTIPLE lenses — tag accordingly.**
+
+**Add 2 dedicated trending-heat searches** (cross-lens), adapted to the reader's field, scoped with `allowed_domains` to aggregators like `news.ycombinator.com`, `producthunt.com`, `techmeme.com`:
 - "Hacker News front page [reader's field] today" / "trending HN [field]"
-- "X / trending [field] thread today"
+- "Techmeme top story today" / "Product Hunt #1 today"
 
 ### Step 3 — Score each candidate
 
