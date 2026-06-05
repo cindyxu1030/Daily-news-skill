@@ -2,7 +2,7 @@
 
 # news-brief
 
-一个为 [Claude Code](https://claude.com/claude-code) 打造的个性化每日**综合简报**技能。第一次运行时，它会先采访 / 研究你，写下一份持久的**读者画像**（agent 对「它在服务谁」的记忆）。之后每天，它跨*你的*视角检索过去 24 小时的新闻，按「时效 / 新鲜度 / 相关性 / 热度 / 跨领域共振 / 个人相关」给每条打分，对过去 7 天去重，挑出覆盖 ≥3 个视角的 5–8 条，并通过 **飞书私信、邮件或本地文件**送达。
+一个为 [Claude Code](https://claude.com/claude-code) 打造的个性化每日**综合简报**技能。第一次运行时，它会先采访 / 研究你，写下一份持久的**读者画像**（agent 对「它在服务谁」的记忆）。之后每天，它从 **可信 RSS 源、Hacker News 与 Hugging Face API、你追踪的 YouTube 创作者、以及按域名定向的网页搜索** 跨*你的*视角抓取候选，按「时效 / 新鲜度 / 相关性 / 热度 / 跨领域共振 / 个人相关」给每条打分，对过去 7 天去重，挑出覆盖 ≥3 个视角的 5–8 条，并通过 **飞书私信、邮件或本地文件**送达。
 
 📖 **新手？先看[手把手教程](TUTORIAL.zh-CN.md)（[English](TUTORIAL.md)）。**
 👀 **想先看产出长什么样：[中文示例](examples/sample-brief.zh-CN.md) · [English sample](examples/sample-brief.md) · [真实飞书私信截图](examples/)。**
@@ -48,6 +48,18 @@ cp ~/.claude/skills/news-brief/config/profile.example.md     ~/.config/news-brie
 
 ---
 
+## 信源
+
+三层，一起打分——高信号，不是 SEO 榜单页：
+
+- **确定性 feeds** —— `scripts/fetch_feeds.py` 抓真·RSS（AI 实验室、MIT Tech Review、BBC/NYT/Guardian/Al Jazeera/Diplomat、市场），加 Hacker News 与 Hugging Face 论文 API，每条都带真实发布时间戳。宽口径世界新闻 feed 支持 `filter_keywords` + `max_items`，让视角聚焦。
+- **YouTube 创作者** —— 抓你追踪创作者的频道 RSS。**不需要 API key**（频道 RSS 自带播放量，爆款视频会被打 `outlier` 标记）。想要更稳的播放数据，加一个**免费** `YOUTUBE_API_KEY`——$0，每天 1 万配额。见[教程](TUTORIAL.zh-CN.md#加可信信源--youtube可选推荐)。
+- **网页搜索** —— 按域名定向（用 `sources.json` 里的 `allowed_domains`），补全广度和 feed 之外的内容。
+
+全部配在 `~/.config/news-brief/sources.json`（`feeds`、`lenses`）。feed 这一步失败也没关系——简报会退回到纯网页搜索，绝不卡住。
+
+---
+
 ## 送达
 
 在 `~/.config/news-brief/settings.json` 里设 `delivery`：
@@ -65,7 +77,8 @@ cp ~/.claude/skills/news-brief/config/profile.example.md     ~/.config/news-brie
 一切都由 `~/.config/news-brief/profile.md` 和 `sources.json` 驱动——基本不用动 `SKILL.md` 本身：
 
 - **读者画像** —— 你是谁、目标、会为什么去行动、输出语言。引导时生成，随时可改。
-- **视角 + 信源** —— 你的话题和信任的媒体（`sources.json`）。
+- **视角 + 信源** —— 你的话题和信任的媒体（`sources.json` → `lenses`）。
+- **Feeds + YouTube** —— RSS/API 源地址和你的 YouTube `channel_id`（`sources.json` → `feeds`）。见[教程](TUTORIAL.zh-CN.md#加可信信源--youtube可选推荐)。
 - **个人相关信号** —— 让一条新闻「算是为你」的模式（在 `profile.md` 里）。
 
 完整格式见 `config/profile.example.md`。
@@ -84,7 +97,8 @@ cp ~/.claude/skills/news-brief/config/profile.example.md     ~/.config/news-brie
 
 - `SKILL.md` —— 技能定义、引导、运行流程
 - `scripts/run_brief.sh` —— 定时入口（`NEWSBRIEF_MODEL` 可配模型、`NEWSBRIEF_DRY_RUN=1` 本地预览、带重试/退避）
-- `scripts/doctor.sh` —— 自检配置（claude、lark-cli、配置、占位符）
+- `scripts/fetch_feeds.py` —— 确定性 RSS/API/YouTube 抓取（`feeds` 注册表）；YouTube 不需 key，可选 `YOUTUBE_API_KEY` 解锁 outlier 排序。见[教程](TUTORIAL.zh-CN.md#加可信信源--youtube可选推荐)
+- `scripts/doctor.sh` —— 自检配置（claude、python3、lark-cli、配置、占位符）
 - `scripts/send_email.py` —— 可选的 SMTP 送达
 - `config/*.example.*` —— `profile.md`、`sources.json`、`settings.json` 的模板
 - `examples/` —— 简报示例（英文 + 中文）

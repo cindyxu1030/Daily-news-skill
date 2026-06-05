@@ -2,7 +2,7 @@
 
 # news-brief
 
-A personalized daily **synthesis brief** skill for [Claude Code](https://claude.com/claude-code). On first run it interviews/researches you and writes a persistent **reader profile** (the agent's memory of who it serves). Then, each day, it searches the last 24 hours across *your* lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via **Lark DM, email, or a local file**.
+A personalized daily **synthesis brief** skill for [Claude Code](https://claude.com/claude-code). On first run it interviews/researches you and writes a persistent **reader profile** (the agent's memory of who it serves). Then, each day, it pulls candidates from **trusted RSS feeds, the Hacker News & Hugging Face APIs, your tracked YouTube creators, and domain-steered web search** across *your* lenses, scores each story on recency / novelty / relevance / trending heat / cross-category resonance / personal-relevance, dedupes against the past week, picks 5–8 stories spanning ≥3 lenses, and delivers a synthesis brief via **Lark DM, email, or a local file**.
 
 📖 **New here? Read the [step-by-step tutorial](TUTORIAL.md) ([中文](TUTORIAL.zh-CN.md)).**
 👀 **See what it produces: [sample brief](examples/sample-brief.md) · [中文示例](examples/sample-brief.zh-CN.md) · [real Lark DM screenshot](examples/).**
@@ -48,6 +48,18 @@ Then pick a delivery channel and schedule it — full walkthrough in the **[tuto
 
 ---
 
+## Sources
+
+Three layers, scored together — high signal, not SEO listicles:
+
+- **Deterministic feeds** — `scripts/fetch_feeds.py` pulls real RSS (AI labs, MIT Tech Review, BBC/NYT/Guardian/Al Jazeera/Diplomat, markets) plus the Hacker News & Hugging Face daily-papers APIs, each with a verified publish timestamp. Broad world feeds take `filter_keywords` + `max_items` so a lens stays on-topic.
+- **YouTube creators** — per-channel RSS for the creators you track. **Works with no API key** (channel RSS carries view counts, so overperforming videos get an `outlier` flag). Add a **free** `YOUTUBE_API_KEY` for more reliable view data — $0, 10k quota/day. See the [tutorial](TUTORIAL.md#add-trusted-feeds--youtube-optional-recommended).
+- **Web search** — domain-steered (`allowed_domains` from your `sources.json`) for breadth and anything outside your feed list.
+
+All configured in `~/.config/news-brief/sources.json` (`feeds`, `lenses`). If the feed pass fails, the brief falls back to web search only — never blocks.
+
+---
+
 ## Delivery
 
 Set `delivery` in `~/.config/news-brief/settings.json`:
@@ -65,7 +77,8 @@ Start with `file`, confirm the output looks right, then switch.
 Everything is driven by `~/.config/news-brief/profile.md` and `sources.json` — you rarely edit `SKILL.md` itself:
 
 - **Reader profile** — who you are, goals, what you'd act on, output language. Built by onboarding; edit anytime.
-- **Lenses + sources** — your topics and the outlets you trust (`sources.json`).
+- **Lenses + sources** — your topics and the outlets you trust (`sources.json` → `lenses`).
+- **Feeds + YouTube** — RSS/API feed URLs and your YouTube `channel_id`s (`sources.json` → `feeds`). See the [tutorial](TUTORIAL.md#add-trusted-feeds--youtube-optional-recommended).
 - **Personal-relevance signal** — the patterns that make a story "for you" (in `profile.md`).
 
 See `config/profile.example.md` for the full shape.
