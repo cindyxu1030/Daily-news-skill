@@ -67,7 +67,7 @@ Read (create empty if missing):
 
     python3 ~/.claude/skills/news-brief/scripts/fetch_feeds.py
 
-It reads the `feeds` registry in `sources.json` and writes `/tmp/newsbrief_candidates.json` — RSS feeds, the HN + Hugging Face daily-papers APIs, and YouTube per-channel RSS. Each item is lens-tagged with a REAL `published` timestamp + `published_hours_ago`. YouTube items carry `views` and an `outlier` ratio (views ÷ channel recent-median); `outlier ≥ 1.5` flags an overperforming video. YouTube works **keyless** (RSS exposes view counts); set `YOUTUBE_API_KEY` in `~/.config/news-brief/.env` for more reliable outlier data. Load this file; these are first-class candidates for Step 3.
+It reads the `feeds` registry in `sources.json` and writes `/tmp/newsbrief_candidates.json` — RSS feeds, the HN + Hugging Face daily-papers APIs, and YouTube per-channel RSS. Each item is lens-tagged with a REAL `published` timestamp + `published_hours_ago`. YouTube items carry `views` and an `outlier` ratio (views ÷ channel recent-median); `outlier ≥ 1.5` flags an overperforming video (a heat signal, applied in Step 3 ONLY to videos that actually report news, not tutorials/opinion). YouTube works **keyless** (RSS exposes view counts); set `YOUTUBE_API_KEY` in `~/.config/news-brief/.env` for more reliable outlier data. Load this file; these are first-class candidates for Step 3.
 
 **GRACEFUL FALLBACK:** if the script errors, the file is missing, or `candidates` is empty, proceed with WebSearch only — never block the brief on the feed pass.
 
@@ -89,6 +89,8 @@ Run 2–3 targeted WebSearch queries per lens defined in `sources.json` / `profi
 Each story scored on these axes. **Sum scores; do not average.** Highest totals win.
 
 **Score BOTH pools together** — feed candidates from `/tmp/newsbrief_candidates.json` and WebSearch results compete in one ranked list. Feed items carry a verified `published` timestamp: use `published_hours_ago` directly for Recency. On overlap, prefer the feed item's URL + timestamp and score it once. A YouTube candidate with `outlier ≥ 1.5` gets a Trending-Heat boost.
+
+**YouTube = news signal, NOT content ideas.** A tracked creator's video counts only when it *reports a development* — a launch, deal, funding, policy change, data/benchmark, or incident. **Drop pure tutorials, how-tos, "I built X", opinion, and format-flex videos even when `outlier` is high** — high views = good content, not news. `outlier` only boosts Trending Heat for a video that is *already* newsworthy on Relevance/Novelty; it never selects a video on its own. Score the underlying development, not the video's popularity.
 
 | Axis | Range | Notes |
 |---|---|---|
