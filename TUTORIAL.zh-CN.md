@@ -97,7 +97,7 @@ python3 ~/.claude/skills/news-brief/scripts/send_email.py \
    - `lark-cli: command not found` → 桥没装好 / 不在 PATH（回去重看桥的安装）。
    - auth / token 过期 → 重新 `lark-cli auth login`。
    - 发送时 permission denied → 机器人缺发送权限，对照 [lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge) 里的权限清单，去开放平台加上再重新授权。
-   - 跑 `./scripts/doctor.sh` 查授权状态、以及是否还留着没替换的 `<YOUR_LARK_OPEN_ID>`。
+   - 跑 `~/.claude/skills/news-brief/scripts/doctor.sh` 查授权状态、以及是否还留着没替换的 `<YOUR_LARK_OPEN_ID>`。
 
 ## 第 5 步 — 设成每天定时
 

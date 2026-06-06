@@ -67,9 +67,17 @@ def main():
 
     try:
         ctx = ssl.create_default_context()
-        with smtplib.SMTP_SSL(host, port, context=ctx) as s:
-            s.login(user, password)
-            s.sendmail(user, recipients, msg.as_string())
+        if port == 465:
+            # implicit TLS (Gmail default)
+            with smtplib.SMTP_SSL(host, port, context=ctx) as s:
+                s.login(user, password)
+                s.sendmail(user, recipients, msg.as_string())
+        else:
+            # submission port (587/25): STARTTLS (Outlook/Office365, most providers)
+            with smtplib.SMTP(host, port) as s:
+                s.starttls(context=ctx)
+                s.login(user, password)
+                s.sendmail(user, recipients, msg.as_string())
         print(f"Email sent to {args.to}")
     except smtplib.SMTPAuthenticationError:
         sys.exit("ERROR: SMTP auth failed. For Gmail use a 16-char App Password, not your account password.")

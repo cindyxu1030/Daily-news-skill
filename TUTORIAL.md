@@ -97,7 +97,7 @@ This is the highest-friction path. Do it only if you actually use Lark.
    - `lark-cli: command not found` → bridge not installed / not on PATH (revisit the bridge setup).
    - auth / token expired → re-run `lark-cli auth login`.
    - permission denied on send → the bot is missing a send scope; check the scope list in [lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge), add it in the developer console, and re-auth.
-   - run `./scripts/doctor.sh` to check auth + a still-unreplaced `<YOUR_LARK_OPEN_ID>`.
+   - run `~/.claude/skills/news-brief/scripts/doctor.sh` to check auth + a still-unreplaced `<YOUR_LARK_OPEN_ID>`.
 
 ## Step 5 — Schedule it daily
 

@@ -35,17 +35,18 @@ Claude Code is the path of least resistance (slash command + scheduling work out
 
 ## Quickstart
 
+**1. Clone** into your Claude Code skills directory:
+
 ```bash
-# 1. Clone into your Claude Code skills directory
 git clone https://github.com/cindyxu1030/Daily-news-skill.git ~/.claude/skills/news-brief
+```
 
-# 2. In Claude Code, run it once — it onboards you (builds your profile + config)
-#    /news-brief
+**2. Onboard** — in Claude Code, run `/news-brief` once. It interviews you and writes your profile + config. **Do this before step 3** — the dry run needs your profile, and will refuse to run without it.
 
-# 3. Preview locally first — writes to ~/Documents/NewsBrief/, sends nothing
+**3. Preview + check** — once onboarded, run a local dry run (writes to `~/Documents/NewsBrief/`, sends nothing) and the setup checker:
+
+```bash
 NEWSBRIEF_DRY_RUN=1 ~/.claude/skills/news-brief/scripts/run_brief.sh
-
-# 4. Check your setup
 ~/.claude/skills/news-brief/scripts/doctor.sh
 ```
 
@@ -80,7 +81,7 @@ Set `delivery` in `~/.config/news-brief/settings.json`:
 
 - **`file`** (default) — saved to `~/Documents/NewsBrief/`. Zero config. Best for testing.
 - **`email`** — via `scripts/send_email.py` (SMTP creds in `~/.config/news-brief/.env`).
-- **`lark`** — Lark/飞书 bot DM. Highest friction: set up the bridge first via **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** (installs `lark-cli`, creates the bot + scopes, authenticates), then add your `open_id`. Full walkthrough in the **[tutorial → Lark setup](TUTORIAL.md)**.
+- **`lark`** — Lark/飞书 bot DM. Highest friction: set up the bridge first via **[cindyxu1030/lark-agents-bridge](https://github.com/cindyxu1030/lark-agents-bridge)** (installs `lark-cli`, creates the bot + scopes, authenticates), then add your `open_id`. Full walkthrough in the **[tutorial → Lark setup](TUTORIAL.md#step-4--choose-how-its-delivered)**.
 
 Start with `file`, confirm the output looks right, then switch.
 

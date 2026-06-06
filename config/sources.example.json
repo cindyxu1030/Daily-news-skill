@@ -41,6 +41,9 @@
       {"lens": "Tech Macro", "source": "Reddit r/stocks", "url": "https://www.reddit.com/r/stocks/.rss", "reliable": false, "curl_fallback": true},
       {"lens": "Geopolitics & Econ", "source": "BBC Business", "url": "https://feeds.bbci.co.uk/news/business/rss.xml", "reliable": true},
       {"lens": "Geopolitics & Econ", "source": "Guardian World", "url": "https://www.theguardian.com/world/rss", "reliable": true, "max_items": 12, "filter_keywords": ["ai", "chip", "semiconductor", "china", "tariff", "sanction", "regulation", "fed", "inflation", "oil", "economy", "tech"]},
+      {"lens": "Geopolitics & Econ", "source": "NYT World", "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "reliable": true, "max_items": 12, "filter_keywords": ["ai", "chip", "semiconductor", "china", "tariff", "sanction", "regulation", "fed", "inflation", "oil", "economy", "tech"]},
+      {"lens": "Geopolitics & Econ", "source": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "reliable": true, "max_items": 12, "filter_keywords": ["ai", "chip", "semiconductor", "china", "tariff", "sanction", "regulation", "fed", "inflation", "oil", "economy", "tech"]},
+      {"lens": "Geopolitics & Econ", "source": "NPR News", "url": "https://feeds.npr.org/1004/rss.xml", "reliable": true, "max_items": 12, "filter_keywords": ["ai", "chip", "semiconductor", "china", "tariff", "sanction", "regulation", "fed", "inflation", "oil", "economy", "tech"]},
       {"lens": "Geopolitics & Econ", "source": "The Diplomat", "url": "https://thediplomat.com/feed/", "reliable": true}
     ],
     "api": [
